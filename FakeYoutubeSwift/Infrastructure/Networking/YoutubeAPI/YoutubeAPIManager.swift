@@ -1,6 +1,6 @@
 import Foundation
 
-let ApplicationKey = ""
+//let ApplicationKey = ""
 
 enum PlaylistDownloadedResult {
     case success(PlaylistItemListResponse)
