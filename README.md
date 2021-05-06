@@ -7,7 +7,7 @@
 * Prefetch為有用Prefetching，在willDisplay綁定UI
 
 # 差異
-此案例單純download image看不太出兩者差異，可以模擬時間延遲，可以在位置（Infrastructure/Cache/Downloader）解開asyncAfter的註解進行模擬。
+此案例單純download image看不太出兩者差異，可以模擬時間延遲，可以在位置（Infrastructure/Cache/Downloader.swift）解開asyncAfter的註解進行模擬。
 
 # 注意
 ApplicationKey需要自行帶入
