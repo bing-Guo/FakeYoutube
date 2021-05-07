@@ -90,7 +90,6 @@ extension ChannelWithPrefetchTableViewController {
 // MARK: - UITableViewDelegate
 extension ChannelWithPrefetchTableViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        print("willDisplay", indexPath)
         guard let cell = cell as? ChannelTableViewCell else { return }
         
         if tableView.isEndOfTable(indexPath) {
@@ -119,7 +118,6 @@ extension ChannelWithPrefetchTableViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        print("didEndDisplaying", indexPath)
         if let dataLoader = viewModel.loadingOperations[indexPath] {
             dataLoader.cancel()
             viewModel.loadingOperations.removeValue(forKey: indexPath)
@@ -134,7 +132,6 @@ extension ChannelWithPrefetchTableViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        print("cellForRowAt", indexPath)
         guard let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: ChannelTableViewCell.self), for: indexPath) as? ChannelTableViewCell else {
             return UITableViewCell()
         }
@@ -168,7 +165,6 @@ extension ChannelWithPrefetchTableViewController: UITableViewDataSource {
 
 extension ChannelWithPrefetchTableViewController: UITableViewDataSourcePrefetching {
     func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-        print(" - prefetchRowsAt", indexPaths)
         for indexPath in indexPaths {
             if let _ = viewModel.loadingOperations[indexPath] { return }
             if let dataLoader = viewModel.loadImage(at: indexPath.row) {
@@ -179,7 +175,6 @@ extension ChannelWithPrefetchTableViewController: UITableViewDataSourcePrefetchi
     }
     
     func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
-        print(" - cancelPrefetchingForRowsAt", indexPaths)
         for indexPath in indexPaths {
             if let dataLoader = viewModel.loadingOperations[indexPath] {
                 dataLoader.cancel()
