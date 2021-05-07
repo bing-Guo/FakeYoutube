@@ -59,28 +59,28 @@ extension ChannelWithPrefetchTableViewController {
 // MARK: - Data Binding
 extension ChannelWithPrefetchTableViewController {
     private func setupBinding() {
-        viewModel.dataDidChangedClosure = { [tableView] _ in
-            DispatchQueue.main.async { [tableView] in
-                tableView.reloadData()
+        viewModel.dataDidChangedClosure = { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.tableView.reloadData()
             }
         }
         
-        viewModel.errorOccurredClosure = { message in
+        viewModel.errorOccurredClosure = { [weak self] message in
             DispatchQueue.main.async {
                 let alertController = UIAlertController(title: message, message: nil, preferredStyle: .alert)
                 let confirmAction = UIAlertAction(title: "確認", style: .default, handler: nil)
                 alertController.addAction(confirmAction)
             
-                self.present(alertController, animated: true, completion: nil)
+                self?.present(alertController, animated: true, completion: nil)
             }
         }
         
-        viewModel.isLoading = { [spinner] isLoading in
+        viewModel.isLoading = { [weak self] isLoading in
             DispatchQueue.main.async {
                 if isLoading {
-                    spinner.startAnimating()
+                    self?.spinner.startAnimating()
                 } else {
-                    spinner.stopAnimating()
+                    self?.spinner.stopAnimating()
                 }
             }
         }
@@ -90,15 +90,16 @@ extension ChannelWithPrefetchTableViewController {
 // MARK: - UITableViewDelegate
 extension ChannelWithPrefetchTableViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        print("willDisplay", indexPath)
         guard let cell = cell as? ChannelTableViewCell else { return }
         
         if tableView.isEndOfTable(indexPath) {
             viewModel.update()
         }
         
-        let updateCellClosure: (UIImage?) -> () = { [viewModel] (image) in
+        let updateCellClosure: (UIImage?) -> Void = { [weak self] image in
             cell.updateAppearanceFor(image)
-            viewModel.loadingOperations.removeValue(forKey: indexPath)
+            self?.viewModel.loadingOperations.removeValue(forKey: indexPath)
         }
         
         if let dataLoader = viewModel.loadingOperations[indexPath] {
@@ -118,6 +119,7 @@ extension ChannelWithPrefetchTableViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        print("didEndDisplaying", indexPath)
         if let dataLoader = viewModel.loadingOperations[indexPath] {
             dataLoader.cancel()
             viewModel.loadingOperations.removeValue(forKey: indexPath)
@@ -132,6 +134,7 @@ extension ChannelWithPrefetchTableViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        print("cellForRowAt", indexPath)
         guard let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: ChannelTableViewCell.self), for: indexPath) as? ChannelTableViewCell else {
             return UITableViewCell()
         }
@@ -165,6 +168,7 @@ extension ChannelWithPrefetchTableViewController: UITableViewDataSource {
 
 extension ChannelWithPrefetchTableViewController: UITableViewDataSourcePrefetching {
     func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        print(" - prefetchRowsAt", indexPaths)
         for indexPath in indexPaths {
             if let _ = viewModel.loadingOperations[indexPath] { return }
             if let dataLoader = viewModel.loadImage(at: indexPath.row) {
@@ -175,6 +179,7 @@ extension ChannelWithPrefetchTableViewController: UITableViewDataSourcePrefetchi
     }
     
     func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
+        print(" - cancelPrefetchingForRowsAt", indexPaths)
         for indexPath in indexPaths {
             if let dataLoader = viewModel.loadingOperations[indexPath] {
                 dataLoader.cancel()

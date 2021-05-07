@@ -57,6 +57,7 @@ class ChannelTableViewCell: UITableViewCell {
     }
     
     override func prepareForReuse() {
+        print("prepareForReuse")
         updateAppearanceFor(nil)
     }
 }
@@ -70,17 +71,15 @@ extension ChannelTableViewCell {
         loadingIndicator.startAnimating()
         
         if let cachedImage = ImageCache.shared.getCache().object(forKey: imageURL as NSURL) {
-            DispatchQueue.main.async { [thumbnailImageView, loadingIndicator] in
-                loadingIndicator.stopAnimating()
-                
-                thumbnailImageView.image = cachedImage
+            DispatchQueue.main.async { [weak self] in
+                self?.loadingIndicator.stopAnimating()
+                self?.thumbnailImageView.image = cachedImage
             }
         } else {
-            Downloader().downloadImage(url: imageURL) { [thumbnailImageView, loadingIndicator] image in
+            Downloader().downloadImage(url: imageURL) { [weak self] cachedImage in
                 DispatchQueue.main.async {
-                    loadingIndicator.stopAnimating()
-                    
-                    thumbnailImageView.image = image
+                    self?.loadingIndicator.stopAnimating()
+                    self?.thumbnailImageView.image = cachedImage
                 }
             }
         }
@@ -89,8 +88,8 @@ extension ChannelTableViewCell {
     func updateAppearanceFor(_ image: UIImage?) {
         loadingIndicator.startAnimating()
         
-        DispatchQueue.main.async { [unowned self] in
-            self.displayImage(image)
+        DispatchQueue.main.async { [weak self] in
+            self?.displayImage(image)
         }
     }
     

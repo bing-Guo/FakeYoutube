@@ -15,8 +15,8 @@ class DataLoadOperation: Operation {
         
         guard let url = imageModel.url else { return }
         
-        downloadImageFrom(url) { (image) in
-            DispatchQueue.main.async() { [weak self] in
+        downloadImageFrom(url) { [weak self] image in
+            DispatchQueue.main.async {
                 guard let self = self else { return }
                 
                 if self.isCancelled { return }

@@ -5,7 +5,7 @@ class ChannelTableViewController: UIViewController {
     let viewModel = ChannelTableViewModel()
     
     private let spinner = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.medium)
-    private let tableView: UITableView = {
+    private lazy var tableView: UITableView = {
         let tableView = UITableView()
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -57,28 +57,28 @@ extension ChannelTableViewController {
 // MARK: - Data Binding
 extension ChannelTableViewController {
     private func setupBinding() {
-        viewModel.dataDidChangedClosure = { [tableView] _ in
-            DispatchQueue.main.async { [tableView] in
-                tableView.reloadData()
+        viewModel.dataDidChangedClosure = { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.tableView.reloadData()
             }
         }
         
-        viewModel.errorOccurredClosure = { message in
+        viewModel.errorOccurredClosure = { [weak self] message in
             DispatchQueue.main.async {
                 let alertController = UIAlertController(title: message, message: nil, preferredStyle: .alert)
                 let confirmAction = UIAlertAction(title: "確認", style: .default, handler: nil)
                 alertController.addAction(confirmAction)
             
-                self.present(alertController, animated: true, completion: nil)
+                self?.present(alertController, animated: true, completion: nil)
             }
         }
         
-        viewModel.isLoading = { [spinner] isLoading in
+        viewModel.isLoading = { [weak self] isLoading in
             DispatchQueue.main.async {
                 if isLoading {
-                    spinner.startAnimating()
+                    self?.spinner.startAnimating()
                 } else {
-                    spinner.stopAnimating()
+                    self?.spinner.stopAnimating()
                 }
             }
         }
